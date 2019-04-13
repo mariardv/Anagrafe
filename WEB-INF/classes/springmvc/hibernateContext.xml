@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:tx="http://www.springframework.org/schema/tx"
+xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+   <!-- Configurazione di JDBC connection-->
+   <bean id="dataSourceBean" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+      <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+      <property name="url" value="jdbc:mysql://localhost:3306/anagrafe" />
+      <property name="username" value="root" />
+      <property name="password" value="root" />
+    
+   </bean>
+   
+   <!-- Configurazione del bean Hibernate5 Session Factory -->
+   <bean id="sessionFactoryBean" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+      <property name="dataSource" ref="dataSourceBean" />
+      <property name="annotatedClasses">
+     	<list>
+		  <value>hibernate.model.ClientForm</value>
+		</list>
+	  </property>
+      <property name="hibernateProperties">
+         <props>
+            <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+            <prop key="hibernate.show_sql">true</prop>
+         </props>
+      </property>
+   </bean>
+     <tx:annotation-driven />
+  <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+    <property name="sessionFactory" ref="sessionFactoryBean" />
+  </bean>
+    
+   <bean id="hibernateTemplateBean" class="org.springframework.orm.hibernate5.HibernateTemplate">
+      <property name="sessionFactory" ref="sessionFactoryBean" />
+       <!-- <property name="checkWriteOperations" value="false"/>-->
+   </bean>
+    <!-- bean che definisce quale classe di servizio usa il bean hibernateTemplate -->
+   <bean id="ServiceBean" class="hibernate.service.DaoService">
+      <property name="s" ref="hibernateTemplateBean" />
+   </bean>
+</beans>
